@@ -25,6 +25,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.example.android.navigationadvancedsample.navigation.attachNavHostFragment
+import com.example.android.navigationadvancedsample.navigation.detachNavHostFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 /**
@@ -192,31 +194,6 @@ private fun BottomNavigationView.setupItemReselected(
             navController.graph.startDestination, false
         )
     }
-}
-
-private fun detachNavHostFragment(
-    fragmentManager: FragmentManager,
-    navHostFragment: NavHostFragment
-) {
-    fragmentManager.beginTransaction()
-        .detach(navHostFragment)
-        .commitNow()
-}
-
-private fun attachNavHostFragment(
-    fragmentManager: FragmentManager,
-    navHostFragment: NavHostFragment,
-    isPrimaryNavFragment: Boolean
-) {
-    fragmentManager.beginTransaction()
-        .attach(navHostFragment)
-        .apply {
-            if (isPrimaryNavFragment) {
-                setPrimaryNavigationFragment(navHostFragment)
-            }
-        }
-        .commitNow()
-
 }
 
 private fun obtainNavHostFragment(

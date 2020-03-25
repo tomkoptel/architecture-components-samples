@@ -9,15 +9,17 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.example.android.navigationadvancedsample.navigation.attachNavHostFragment
+import com.example.android.navigationadvancedsample.navigation.detachNavHostFragment
 
 class NavHostFragmentFactory (
         private val target: AppCompatActivity,
+        private val navigationViewModel: NavigationViewModel,
         private val navGraphIds: List<Int>,
         @param:IdRes private val containerId: Int
 ) {
     fun onCreate() {
         val graphIdToTagMap = SparseArray<String>()
-        var firstFragmentGraphId = 0
 
         navGraphIds.forEachIndexed { index, navGraphId ->
             val fragmentTag = getFragmentTag(index)
@@ -29,20 +31,12 @@ class NavHostFragmentFactory (
                 navGraphId,
                 containerId
             )
-
-            // Obtain its id
             val graphId = navHostFragment.navController.graph.id
-
-            if (index == 0) {
-                firstFragmentGraphId = graphId
-            }
-
-            // Save to the map
-//            graphIdToTagMap[graphId] = fragmentTag
+            graphIdToTagMap[graphId] = fragmentTag
 
             // Attach or detach nav host fragment depending on whether it's the selected item.
-            if (firstFragmentGraphId == graphId) {
-                // Update livedata with the selected graph
+            val firstFragment = index == 0
+            if (firstFragment) {
 //                selectedNavController.value = navHostFragment.navController
                 val isPrimaryNavFragment = index == 0
                 Log.d("NavigationExtensions", "isPrimaryNavFragment=$isPrimaryNavFragment")
@@ -51,30 +45,6 @@ class NavHostFragmentFactory (
                 detachNavHostFragment(target.supportFragmentManager, navHostFragment)
             }
         }
-    }
-
-    private fun detachNavHostFragment(
-        fragmentManager: FragmentManager,
-        navHostFragment: NavHostFragment
-    ) {
-        fragmentManager.beginTransaction()
-            .detach(navHostFragment)
-            .commitNow()
-    }
-
-    private fun attachNavHostFragment(
-        fragmentManager: FragmentManager,
-        navHostFragment: NavHostFragment,
-        isPrimaryNavFragment: Boolean
-    ) {
-        fragmentManager.beginTransaction()
-            .attach(navHostFragment)
-            .apply {
-                if (isPrimaryNavFragment) {
-                    setPrimaryNavigationFragment(navHostFragment)
-                }
-            }
-            .commitNow()
     }
 
     private fun obtainNavHostFragment(

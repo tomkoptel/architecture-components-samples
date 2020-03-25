@@ -37,9 +37,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         NavHostFragmentFactory(
-                target = this,
-                navGraphIds = listOf(R.navigation.home, R.navigation.list, R.navigation.form),
-                containerId = R.id.nav_host_container
+            target = this,
+            navigationViewModel = navigationViewModel,
+            navGraphIds = listOf(R.navigation.home, R.navigation.list, R.navigation.form),
+            containerId = R.id.nav_host_container
         ).apply { onCreate() }
     }
 
