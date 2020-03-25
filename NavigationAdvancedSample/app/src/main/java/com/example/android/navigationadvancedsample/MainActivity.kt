@@ -22,29 +22,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.android.navigationadvancedsample.homescreen.About
 import com.example.android.navigationadvancedsample.homescreen.Title
 
-/**
- * /navigation/form NavHostFragment(NavController)
- * /navigation/home NavHostFragment(NavController)
- * /navigation/list NavHostFragment(NavController)
- */
 class MainActivity : AppCompatActivity() {
-    private lateinit var navigationViewModel: NavigationViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        navigationViewModel = ViewModelProvider(this).get(NavigationViewModel::class.java)
-
         setContentView(R.layout.activity_main)
-
-        NavHostFragmentFactory(
-            target = this,
-            navigationViewModel = navigationViewModel,
-            navGraphIds = listOf(R.navigation.home, R.navigation.list, R.navigation.form),
-            containerId = R.id.nav_host_container
-        ).apply { onCreate() }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        return navigationViewModel.onSupportNavigateUp()
+        setUpMultipleNavBackStacks(R.id.nav_host_container)
     }
 }

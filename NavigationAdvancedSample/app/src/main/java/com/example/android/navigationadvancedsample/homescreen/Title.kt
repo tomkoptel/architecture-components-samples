@@ -23,37 +23,27 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.android.navigationadvancedsample.NavigationBarDelegate
 import com.example.android.navigationadvancedsample.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomnavigation.configureNavController
 
 /**
  * Shows the main title screen with a button that navigates to [About].
  */
 class Title : Fragment() {
-//    private val delegate = NavigationBarDelegate(
-//            fragment = this,
-//            navBarId = R.id.bottom_nav,
-//            containerId = R.id.nav_host_container
-//    )
-//
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//        delegate.onActivityCreated(savedInstanceState)
-//    }
-//
-////    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-////        super.onViewStateRestored(savedInstanceState)
-////        delegate.onRestoreInstanceState(savedInstanceState)
-////    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_title, container, false)
+        return inflater.inflate(R.layout.fragment_title, container, false)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         view.findViewById<Button>(R.id.about_btn).setOnClickListener {
             findNavController().navigate(R.id.action_title_to_about)
         }
-        return view
+        view.findViewById<BottomNavigationView>(R.id.bottom_nav)?.let { bottomNavigationView ->
+            configureNavController(bottomNavigationView)
+        }
     }
 }

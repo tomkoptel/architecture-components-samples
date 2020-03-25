@@ -46,4 +46,5 @@
     <string name="cd_home">Home</string>
     <string name="cd_list">List</string>
     <string name="cd_form">Form</string>
+    <id name="navControllerViewTag" />
 </resources>
