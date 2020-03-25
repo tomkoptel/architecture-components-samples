@@ -13,7 +13,7 @@ class NavigationViewModel : ViewModel() {
     private val graphIdToTagMap = SparseArray<String>()
 
     val navGraphIds: List<Int> = listOf(R.navigation.home, R.navigation.list, R.navigation.form)
-    var currentSelectedTab: Int = 0
+    var currentSelectedTab: Int = R.id.home
     var currentNavController: LiveData<NavController>? = null
 
     fun onSupportNavigateUp(): Boolean {

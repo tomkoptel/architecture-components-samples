@@ -27,6 +27,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.navigationadvancedsample.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomnavigation.configureNavController
 
 /**
  * Shows a static leaderboard with multiple users.
@@ -48,6 +50,9 @@ class Leaderboard : Fragment() {
             // specify an viewAdapter (see also next example)
             adapter = viewAdapter
 
+        }
+        view.findViewById<BottomNavigationView>(R.id.bottom_nav)?.let { bottomNavigationView ->
+            configureNavController(bottomNavigationView)
         }
         return view
     }

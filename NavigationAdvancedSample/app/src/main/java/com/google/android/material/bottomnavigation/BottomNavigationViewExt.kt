@@ -47,12 +47,15 @@ private class BottomNavigationViewController(
         val navGraphIds = viewModel.navGraphIds
 
         // Now connect selecting an item with swapping Fragments
-        var selectedItemTag = viewModel.findTag(bottomNavigationView.selectedItemId)
+        var selectedItemTag = viewModel.findTag(viewModel.currentSelectedTab)
         val firstFragmentGraphId = navGraphIds.first()
         val firstFragmentTag = viewModel.findTag(firstFragmentGraphId)
 
         // When a navigation item is selected
+        bottomNavigationView.selectedItemId = viewModel.currentSelectedTab
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            viewModel.currentSelectedTab = item.itemId
+
             // Don't do anything if the state is state has already been saved.
             if (fragmentManager.isStateSaved) {
                 false
