@@ -23,29 +23,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.android.navigationadvancedsample.NavigationBarDelegate
 import com.example.android.navigationadvancedsample.R
 
 /**
- * Shows "About" 2
+ * Shows "About" with nav bar
  */
 class AboutWithNavBar : Fragment() {
-//    private val delegate = NavigationBarDelegate(
-//            fragment = this,
-//            navBarId = R.id.bottom_nav,
-//            containerId = R.id.nav_host_container
-//    )
-//
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//        delegate.onActivityCreated(savedInstanceState)
-//    }
-//
-//    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-//        super.onViewStateRestored(savedInstanceState)
-//        delegate.onRestoreInstanceState(savedInstanceState)
-//    }
-
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
