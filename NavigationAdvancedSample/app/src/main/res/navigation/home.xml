@@ -31,9 +31,20 @@
             android:id="@+id/action_title_to_about"
             app:destination="@id/aboutScreen"/>
     </fragment>
+
     <fragment
         android:id="@+id/aboutScreen"
         android:name="com.example.android.navigationadvancedsample.homescreen.About"
+        android:label="@string/title_about"
+        tools:layout="@layout/fragment_about">
+        <action
+            android:id="@+id/action_nav_to_about_with_nav_bar"
+            app:destination="@id/aboutWithNavBar"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/aboutWithNavBar"
+        android:name="com.example.android.navigationadvancedsample.homescreen.AboutWithNavBar"
         android:label="@string/title_about"
         tools:layout="@layout/fragment_about"/>
 </navigation>
