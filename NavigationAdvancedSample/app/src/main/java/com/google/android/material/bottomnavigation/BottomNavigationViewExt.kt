@@ -4,7 +4,9 @@ package com.google.android.material.bottomnavigation
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.android.navigationadvancedsample.NavigationViewModel
@@ -24,17 +26,7 @@ internal fun Fragment.configureNavController(
         fragmentManager = requireActivity().supportFragmentManager,
         bottomNavigationView = bottomNavigationView
     )
-
-    controller.setOnNavigationItemSelectedListener()
-    // Optional: on item reselected, pop back stack to the destination of the graph
-    controller.setupItemReselected()
-
-    // FIXME: Handle deep link
-//    setupDeepLinks(navGraphIds, fragmentManager, containerId, intent)
-
-    // Finally, ensure that we update our BottomNavigationView when the back stack changes
-    controller.setupItemReselected()
-
+    viewLifecycleOwner.lifecycle.addObserver(controller)
     return bottomNavigationView
 }
 
@@ -42,8 +34,29 @@ private class BottomNavigationViewController(
     private val viewModel: NavigationViewModel,
     private val fragmentManager: FragmentManager,
     private val bottomNavigationView: BottomNavigationView
-) {
-    fun setOnNavigationItemSelectedListener() {
+) : LifecycleObserver {
+    private var addOnBackStackChangedListener: () -> Unit = {}
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun onCreate() {
+        setOnNavigationItemSelectedListener()
+
+        // FIXME: Handle deep link
+//    setupDeepLinks(navGraphIds, fragmentManager, containerId, intent)
+
+        // Optional: on item reselected, pop back stack to the destination of the graph
+        setupItemReselected()
+
+        // Finally, ensure that we update our BottomNavigationView when the back stack changes
+        fixFragmentBackStack()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun onDestroy() {
+        cleanUp()
+    }
+
+    private fun setOnNavigationItemSelectedListener() {
         val navGraphIds = viewModel.navGraphIds
 
         // Now connect selecting an item with swapping Fragments
@@ -103,7 +116,7 @@ private class BottomNavigationViewController(
         }
     }
 
-    fun setupItemReselected() {
+    private fun setupItemReselected() {
         bottomNavigationView.setOnNavigationItemReselectedListener { item ->
             val newlySelectedItemTag = viewModel.findTag(item.itemId)
             val selectedFragment =
@@ -116,13 +129,13 @@ private class BottomNavigationViewController(
         }
     }
 
-    fun fixFragmentBackStack() {
+    private fun fixFragmentBackStack() {
         val selectedItemTag = viewModel.findTag(bottomNavigationView.selectedItemId)
         val firstFragmentGraphId = viewModel.navGraphIds.first()
         val firstFragmentTag = viewModel.findTag(firstFragmentGraphId)
         val isOnFirstFragment = selectedItemTag == firstFragmentTag
 
-        fragmentManager.addOnBackStackChangedListener {
+        addOnBackStackChangedListener = {
             if (!isOnFirstFragment && !fragmentManager.isOnBackStack(firstFragmentTag)) {
                 bottomNavigationView.selectedItemId = firstFragmentGraphId
             }
@@ -136,6 +149,13 @@ private class BottomNavigationViewController(
                 }
             }
         }
+        fragmentManager.addOnBackStackChangedListener(addOnBackStackChangedListener)
+    }
+
+    private fun cleanUp() {
+        bottomNavigationView.setOnNavigationItemReselectedListener(null)
+        bottomNavigationView.setOnNavigationItemSelectedListener(null)
+        fragmentManager.removeOnBackStackChangedListener(addOnBackStackChangedListener)
     }
 
     private fun FragmentManager.isOnBackStack(backStackName: String): Boolean {
