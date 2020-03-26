@@ -16,6 +16,7 @@
 
 package com.example.android.navigationadvancedsample.homescreen
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.android.navigationadvancedsample.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomnavigation.configureNavController
 
 /**
  * Shows "About" with nav bar
@@ -38,6 +41,7 @@ class AboutWithNavBar : Fragment() {
         return inflater.inflate(R.layout.fragment_about_with_nav_bar, container, false)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<TextView>(R.id.about_tv).apply {
@@ -45,6 +49,9 @@ class AboutWithNavBar : Fragment() {
             setOnClickListener {
                 findNavController().navigate(R.id.action_nav_to_about_with_nav_bar)
             }
+        }
+        view.findViewById<BottomNavigationView>(R.id.bottom_nav)?.let { bottomNavigationView ->
+            configureNavController(bottomNavigationView)
         }
     }
 }
