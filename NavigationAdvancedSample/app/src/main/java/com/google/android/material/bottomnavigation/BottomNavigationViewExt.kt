@@ -2,11 +2,10 @@
 
 package com.google.android.material.bottomnavigation
 
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.android.navigationadvancedsample.NavigationViewModel
@@ -20,25 +19,44 @@ import com.example.android.navigationadvancedsample.R
 internal fun Fragment.configureNavController(
     bottomNavigationView: BottomNavigationView
 ): BottomNavigationView {
-    val viewModel = NavigationViewModel(requireActivity())
+    val activity = requireActivity()
+    val application = activity.application
+    val viewModel = NavigationViewModel(activity)
+    val factory = SavedStateViewModelFactory(application, this)
+    val bottomNavigationViewModel = ViewModelProvider(this, factory).get(BottomNavigationViewModel::class.java)
+    
     val controller = BottomNavigationViewController(
-        viewModel = viewModel,
+        globalNavViewModel = viewModel,
         fragmentManager = requireActivity().supportFragmentManager,
-        bottomNavigationView = bottomNavigationView
+        bottomNavigationView = bottomNavigationView,
+        bottomNavigationViewModel = bottomNavigationViewModel
     )
     viewLifecycleOwner.lifecycle.addObserver(controller)
+
     return bottomNavigationView
 }
 
+internal class BottomNavigationViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
+    val selectedTab: Int
+        get() = savedStateHandle.get<Int>("REGULAR_KEY") ?: 0
+
+    fun saveSelectedTab(selectedId: Int) {
+        savedStateHandle.set("REGULAR_KEY", selectedId)
+    }
+}
+
 private class BottomNavigationViewController(
-    private val viewModel: NavigationViewModel,
+    private val globalNavViewModel: NavigationViewModel,
     private val fragmentManager: FragmentManager,
-    private val bottomNavigationView: BottomNavigationView
+    private val bottomNavigationView: BottomNavigationView,
+    private val bottomNavigationViewModel: BottomNavigationViewModel
 ) : LifecycleObserver {
     private var backStackChangedListener: BackStackChangedListener? = null
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
+        restoreState()
+
         setOnNavigationItemSelectedListener()
 
         // FIXME: Handle deep link
@@ -51,29 +69,53 @@ private class BottomNavigationViewController(
         fixFragmentBackStack()
     }
 
+    /**
+     * We are working with unique instance of tab bar and thus we need a way to restore its state
+     * the last time we had hosting fragment killed. It means that when we select
+     * 'Tab A -> Tab B -> back' we do expect the navigation tab bar to retain its previously selected
+     * state.
+     */
+    private fun restoreState() {
+        val restoreSelectedState = restoreSelectedState()
+        Log.d("BottomNavigation", addLogSuffix("selectedItemId=${bottomNavigationView.selectedItemId} restoreSelectedState=${restoreSelectedState}"))
+        bottomNavigationView.selectedItemId = restoreSelectedState
+        globalNavViewModel.currentSelectedTab = restoreSelectedState
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
         cleanUp()
     }
 
+    private fun restoreSelectedState(): Int {
+        val restoredArg = bottomNavigationViewModel.selectedTab
+        return if (restoredArg == 0) {
+            globalNavViewModel.currentSelectedTab
+        } else {
+            restoredArg
+        }
+    }
+
     private fun setOnNavigationItemSelectedListener() {
-        val navGraphIds = viewModel.navGraphIds
+        val navGraphIds = globalNavViewModel.navGraphIds
 
         // Now connect selecting an item with swapping Fragments
-        var selectedItemTag = viewModel.findTag(viewModel.currentSelectedTab)
+        var selectedItemTag = globalNavViewModel.findTag(globalNavViewModel.currentSelectedTab)
         val firstFragmentGraphId = navGraphIds.first()
-        val firstFragmentTag = viewModel.findTag(firstFragmentGraphId)
+        val firstFragmentTag = globalNavViewModel.findTag(firstFragmentGraphId)
 
         // When a navigation item is selected
-        bottomNavigationView.selectedItemId = viewModel.currentSelectedTab
+        val previousItem = bottomNavigationView.selectedItemId
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
-            viewModel.currentSelectedTab = item.itemId
+            Log.d("BottomNavigation", addLogSuffix("item=${item} id=${item.itemId} previousItem=${previousItem}"))
+            bottomNavigationViewModel.saveSelectedTab(previousItem)
+            globalNavViewModel.currentSelectedTab = item.itemId
 
             // Don't do anything if the state is state has already been saved.
             if (fragmentManager.isStateSaved) {
                 false
             } else {
-                val newlySelectedItemTag = viewModel.findTag(item.itemId)
+                val newlySelectedItemTag = globalNavViewModel.findTag(item.itemId)
                 if (selectedItemTag != newlySelectedItemTag) {
                     // Pop everything above the first fragment (the "fixed start destination")
                     fragmentManager.popBackStack(firstFragmentTag,
@@ -94,7 +136,7 @@ private class BottomNavigationViewController(
                             .attach(selectedFragment)
                             .setPrimaryNavigationFragment(selectedFragment)
                             .apply {
-                                val navFragmentTags = viewModel.navFragmentTags
+                                val navFragmentTags = globalNavViewModel.navFragmentTags
                                 // Detach all other Fragments
                                 navFragmentTags.forEach { fragmentTagIter ->
                                     if (fragmentTagIter != newlySelectedItemTag) {
@@ -118,7 +160,7 @@ private class BottomNavigationViewController(
 
     private fun setupItemReselected() {
         bottomNavigationView.setOnNavigationItemReselectedListener { item ->
-            val newlySelectedItemTag = viewModel.findTag(item.itemId)
+            val newlySelectedItemTag = globalNavViewModel.findTag(item.itemId)
             val selectedFragment =
                 fragmentManager.findFragmentByTag(newlySelectedItemTag) as NavHostFragment
             val navController = selectedFragment.navController
@@ -130,7 +172,7 @@ private class BottomNavigationViewController(
     }
 
     private fun fixFragmentBackStack() {
-        val changedListener = BackStackChangedListener(fragmentManager, viewModel, bottomNavigationView)
+        val changedListener = BackStackChangedListener(fragmentManager, globalNavViewModel, bottomNavigationView)
         fragmentManager.addOnBackStackChangedListener(changedListener)
         backStackChangedListener = changedListener
     }
@@ -142,6 +184,11 @@ private class BottomNavigationViewController(
             fragmentManager.removeOnBackStackChangedListener(listener)
             backStackChangedListener = null
         }
+    }
+
+    private fun addLogSuffix(log: String): String {
+        return "\n\t bottomNavigationViewModel=${bottomNavigationViewModel} \n\t navigationViewModel=${globalNavViewModel} \n" +
+            "\t bottomNavigationView=${bottomNavigationView} \n\t $log"
     }
 
     private class BackStackChangedListener(
