@@ -21,7 +21,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setupWithNavController
 import com.example.android.navigationadvancedsample.R
 import com.example.android.navigationadvancedsample.listscreen.MyAdapter.Companion.USERNAME_KEY
 
@@ -39,6 +41,10 @@ class UserProfile : Fragment() {
 
         val name = arguments?.getString(USERNAME_KEY) ?: "Ali Connors"
         view.findViewById<TextView>(R.id.profile_user_name).text = name
+
+        view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
+            setupWithNavController(toolbar)
+        }
         return view
     }
 }

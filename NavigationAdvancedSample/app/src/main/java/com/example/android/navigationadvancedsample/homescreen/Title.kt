@@ -21,9 +21,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setupWithNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import com.example.android.navigationadvancedsample.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomnavigation.configureNavController
 
 /**
  * Shows the main title screen with a button that navigates to [About].
@@ -32,11 +38,19 @@ class Title : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_title, container, false)
+        return inflater.inflate(R.layout.fragment_title, container, false)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
+            setupWithNavController(toolbar)
+        }
         view.findViewById<Button>(R.id.about_btn).setOnClickListener {
             findNavController().navigate(R.id.action_title_to_about)
         }
-        return view
+        view.findViewById<BottomNavigationView>(R.id.bottom_nav)?.let { bottomNavigationView ->
+            configureNavController(bottomNavigationView)
+        }
     }
 }

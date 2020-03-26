@@ -20,8 +20,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setupWithNavController
 import com.example.android.navigationadvancedsample.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomnavigation.configureNavController
 
 /**
  * Shows "Done".
@@ -32,5 +36,15 @@ class Registered : Fragment() {
     ): View? {
 
         return inflater.inflate(R.layout.fragment_registered, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.findViewById<BottomNavigationView>(R.id.bottom_nav)?.let { bottomNavigationView ->
+            configureNavController(bottomNavigationView)
+        }
+        view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
+            setupWithNavController(toolbar)
+        }
     }
 }

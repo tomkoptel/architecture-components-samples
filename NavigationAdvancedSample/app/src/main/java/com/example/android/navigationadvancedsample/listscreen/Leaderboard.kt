@@ -22,11 +22,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setupWithNavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.navigationadvancedsample.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomnavigation.configureNavController
 
 /**
  * Shows a static leaderboard with multiple users.
@@ -49,6 +53,13 @@ class Leaderboard : Fragment() {
             adapter = viewAdapter
 
         }
+        view.findViewById<BottomNavigationView>(R.id.bottom_nav)?.let { bottomNavigationView ->
+            configureNavController(bottomNavigationView)
+        }
+        view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
+            setupWithNavController(toolbar)
+        }
+
         return view
     }
 

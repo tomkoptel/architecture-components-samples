@@ -32,6 +32,7 @@ import org.hamcrest.CoreMatchers.allOf
 import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 
 class BottomNavigationTest {
@@ -131,8 +132,8 @@ class BottomNavigationTest {
     }
 
     private fun assertSecondScreen() {
-        onView(allOf(withText(R.string.title_list), isDescendantOfA(withId(R.id.action_bar))))
-                .check(matches(isDisplayed()))
+        onView(allOf(withText(R.string.title_list), isDescendantOfA(withId(R.id.toolbar))))
+            .check(matches(isDisplayed()))
     }
 
     private fun openSecondScreen() {
