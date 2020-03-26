@@ -57,7 +57,6 @@ class Leaderboard : Fragment() {
             configureNavController(bottomNavigationView)
         }
         view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
-            toolbar.setTitle(R.string.title_list)
             setupWithNavController(toolbar)
         }
 

@@ -42,13 +42,10 @@ class About : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
-            toolbar.setTitle(R.string.about)
             setupWithNavController(toolbar)
         }
-        view.findViewById<TextView>(R.id.about_tv).apply {
-            setOnClickListener {
-                findNavController().navigate(R.id.action_nav_to_about_with_nav_bar)
-            }
+        view.findViewById<TextView>(R.id.about_tv).setOnClickListener {
+            findNavController().navigate(R.id.action_nav_to_about_with_nav_bar)
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.android.navigationadvancedsample
 
 import androidx.annotation.IdRes
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.NavHostFragment
@@ -9,8 +10,9 @@ import com.example.android.navigationadvancedsample.navigation.detachNavHostFrag
 
 internal fun FragmentActivity.setUpMultipleNavBackStacks(@IdRes containerId: Int) {
     val viewModel = NavigationViewModel(this)
+    val navGraphIds = viewModel.navGraphIds
 
-    viewModel.navGraphIds.forEachIndexed { index, navGraphId ->
+    navGraphIds.forEachIndexed { index, navGraphId ->
         val fragmentTag = getFragmentTag(index)
 
         // Find or create the Navigation host fragment
@@ -20,7 +22,8 @@ internal fun FragmentActivity.setUpMultipleNavBackStacks(@IdRes containerId: Int
             navGraphId,
             containerId
         )
-        val graphId = navHostFragment.navController.graph.id
+        val navController = navHostFragment.navController
+        val graphId = navController.graph.id
         viewModel.registerTag(key = graphId, tag = fragmentTag)
         viewModel.registerTag(key = navGraphId, tag = fragmentTag)
 
@@ -30,6 +33,37 @@ internal fun FragmentActivity.setUpMultipleNavBackStacks(@IdRes containerId: Int
             attachNavHostFragment(supportFragmentManager, navHostFragment, true)
         } else {
             detachNavHostFragment(supportFragmentManager, navHostFragment)
+        }
+    }
+}
+
+internal fun FragmentActivity.handleDeepLinks(@IdRes containerId: Int) {
+    val viewModel = NavigationViewModel(this)
+    val navGraphIds = viewModel.navGraphIds
+
+    val map = mutableMapOf<NavHostFragment, Boolean>()
+    navGraphIds.forEachIndexed { index, navGraphId ->
+        val fragmentTag = getFragmentTag(index)
+        val navHostFragment = obtainNavHostFragment(
+            supportFragmentManager,
+            fragmentTag,
+            navGraphId,
+            containerId
+        )
+        val wasHandled = navHostFragment.navController.handleDeepLink(intent)
+        map.put(navHostFragment, wasHandled)
+    }
+
+    val wasHandled = map.values.reduce { a, b -> a || b }
+    if (wasHandled) {
+        map.forEach { (navHostFragment, wasHandled) ->
+            val navController = navHostFragment.navController
+            if (wasHandled) {
+                viewModel.currentSelectedTab = navController.graph.id
+                attachNavHostFragment(supportFragmentManager, navHostFragment, true)
+            } else {
+                detachNavHostFragment(supportFragmentManager, navHostFragment)
+            }
         }
     }
 }

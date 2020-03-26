@@ -43,7 +43,6 @@ class UserProfile : Fragment() {
         view.findViewById<TextView>(R.id.profile_user_name).text = name
 
         view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
-            toolbar.title = name
             setupWithNavController(toolbar)
         }
         return view

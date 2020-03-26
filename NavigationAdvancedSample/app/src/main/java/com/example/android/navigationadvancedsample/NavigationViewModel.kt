@@ -14,11 +14,6 @@ class NavigationViewModel : ViewModel() {
 
     val navGraphIds: List<Int> = listOf(R.navigation.home, R.navigation.list, R.navigation.form)
     var currentSelectedTab: Int = R.id.home
-    var currentNavController: LiveData<NavController>? = null
-
-    fun onSupportNavigateUp(): Boolean {
-        return currentNavController?.value?.navigateUp() ?: false
-    }
 
     fun findTag(key: Int) : String = checkNotNull(graphIdToTagMap[key]) {
         "We have issue in registering tag for provided key=$key."

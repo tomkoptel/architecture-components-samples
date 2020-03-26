@@ -18,14 +18,19 @@ package com.example.android.navigationadvancedsample
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
-import com.example.android.navigationadvancedsample.homescreen.About
-import com.example.android.navigationadvancedsample.homescreen.Title
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        if (savedInstanceState == null) {
+            setUpMultipleNavBackStacks(R.id.nav_host_container)
+        }
+        handleDeepLinks(R.id.nav_host_container)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
         setUpMultipleNavBackStacks(R.id.nav_host_container)
     }
 }

@@ -48,7 +48,6 @@ class AboutWithNavBar : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
-            toolbar.setTitle(R.string.custom_about)
             setupWithNavController(toolbar)
         }
         view.findViewById<TextView>(R.id.about_tv).apply {

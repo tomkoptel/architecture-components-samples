@@ -44,7 +44,6 @@ class Title : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
-            toolbar.setTitle(R.string.cd_home)
             setupWithNavController(toolbar)
         }
         view.findViewById<Button>(R.id.about_btn).setOnClickListener {

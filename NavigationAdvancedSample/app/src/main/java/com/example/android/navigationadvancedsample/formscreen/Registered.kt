@@ -44,7 +44,6 @@ class Registered : Fragment() {
             configureNavController(bottomNavigationView)
         }
         view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
-            toolbar.setTitle(R.string.title_registered)
             setupWithNavController(toolbar)
         }
     }
