@@ -35,7 +35,7 @@ private class BottomNavigationViewController(
     private val fragmentManager: FragmentManager,
     private val bottomNavigationView: BottomNavigationView
 ) : LifecycleObserver {
-    private var addOnBackStackChangedListener: () -> Unit = {}
+    private var backStackChangedListener: BackStackChangedListener? = null
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
@@ -130,12 +130,31 @@ private class BottomNavigationViewController(
     }
 
     private fun fixFragmentBackStack() {
-        val selectedItemTag = viewModel.findTag(bottomNavigationView.selectedItemId)
-        val firstFragmentGraphId = viewModel.navGraphIds.first()
-        val firstFragmentTag = viewModel.findTag(firstFragmentGraphId)
-        val isOnFirstFragment = selectedItemTag == firstFragmentTag
+        val changedListener = BackStackChangedListener(fragmentManager, viewModel, bottomNavigationView)
+        fragmentManager.addOnBackStackChangedListener(changedListener)
+        backStackChangedListener = changedListener
+    }
 
-        addOnBackStackChangedListener = {
+    private fun cleanUp() {
+        bottomNavigationView.setOnNavigationItemReselectedListener(null)
+        bottomNavigationView.setOnNavigationItemSelectedListener(null)
+        backStackChangedListener?.let { listener ->
+            fragmentManager.removeOnBackStackChangedListener(listener)
+            backStackChangedListener = null
+        }
+    }
+
+    private class BackStackChangedListener(
+        private val fragmentManager: FragmentManager,
+        private val viewModel: NavigationViewModel,
+        private val bottomNavigationView: BottomNavigationView
+    ) : FragmentManager.OnBackStackChangedListener {
+        override fun onBackStackChanged() {
+            val selectedItemTag = viewModel.findTag(bottomNavigationView.selectedItemId)
+            val firstFragmentGraphId = viewModel.navGraphIds.first()
+            val firstFragmentTag = viewModel.findTag(firstFragmentGraphId)
+            val isOnFirstFragment = selectedItemTag == firstFragmentTag
+
             if (!isOnFirstFragment && !fragmentManager.isOnBackStack(firstFragmentTag)) {
                 bottomNavigationView.selectedItemId = firstFragmentGraphId
             }
@@ -149,22 +168,15 @@ private class BottomNavigationViewController(
                 }
             }
         }
-        fragmentManager.addOnBackStackChangedListener(addOnBackStackChangedListener)
-    }
 
-    private fun cleanUp() {
-        bottomNavigationView.setOnNavigationItemReselectedListener(null)
-        bottomNavigationView.setOnNavigationItemSelectedListener(null)
-        fragmentManager.removeOnBackStackChangedListener(addOnBackStackChangedListener)
-    }
-
-    private fun FragmentManager.isOnBackStack(backStackName: String): Boolean {
-        val backStackCount = backStackEntryCount
-        for (index in 0 until backStackCount) {
-            if (getBackStackEntryAt(index).name == backStackName) {
-                return true
+        private fun FragmentManager.isOnBackStack(backStackName: String): Boolean {
+            val backStackCount = backStackEntryCount
+            for (index in 0 until backStackCount) {
+                if (getBackStackEntryAt(index).name == backStackName) {
+                    return true
+                }
             }
+            return false
         }
-        return false
     }
 }
