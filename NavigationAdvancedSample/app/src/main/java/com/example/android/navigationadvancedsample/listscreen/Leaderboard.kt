@@ -22,8 +22,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setupWithNavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.navigationadvancedsample.R
@@ -54,6 +56,11 @@ class Leaderboard : Fragment() {
         view.findViewById<BottomNavigationView>(R.id.bottom_nav)?.let { bottomNavigationView ->
             configureNavController(bottomNavigationView)
         }
+        view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
+            toolbar.setTitle(R.string.title_list)
+            setupWithNavController(toolbar)
+        }
+
         return view
     }
 

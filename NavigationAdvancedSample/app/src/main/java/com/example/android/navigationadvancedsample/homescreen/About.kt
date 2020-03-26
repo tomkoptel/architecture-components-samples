@@ -21,8 +21,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setupWithNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import com.example.android.navigationadvancedsample.R
 
 /**
@@ -32,12 +36,15 @@ class About : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-
         return inflater.inflate(R.layout.fragment_about, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
+            toolbar.setTitle(R.string.about)
+            setupWithNavController(toolbar)
+        }
         view.findViewById<TextView>(R.id.about_tv).apply {
             setOnClickListener {
                 findNavController().navigate(R.id.action_nav_to_about_with_nav_bar)

@@ -21,7 +21,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setupWithNavController
 import androidx.navigation.fragment.findNavController
 import com.example.android.navigationadvancedsample.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -43,6 +45,10 @@ class Register : Fragment() {
         }
         view.findViewById<BottomNavigationView>(R.id.bottom_nav)?.let { bottomNavigationView ->
             configureNavController(bottomNavigationView)
+        }
+        view.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
+            toolbar.setTitle(R.string.title_register)
+            setupWithNavController(toolbar)
         }
         return view
     }
