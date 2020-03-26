@@ -24,6 +24,8 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.android.navigationadvancedsample.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomnavigation.configureNavController
 
 
 /**
@@ -38,6 +40,9 @@ class Register : Fragment() {
 
         view.findViewById<Button>(R.id.signup_btn).setOnClickListener {
             findNavController().navigate(R.id.action_register_to_registered)
+        }
+        view.findViewById<BottomNavigationView>(R.id.bottom_nav)?.let { bottomNavigationView ->
+            configureNavController(bottomNavigationView)
         }
         return view
     }
